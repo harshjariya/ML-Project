@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Deposit Predictor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 800px;
+        }
+        h2 { color: #4a148c; font-weight: bold; margin-bottom: 25px; text-align: center; }
+        .form-label { font-weight: 600; color: #333; }
+        .btn-predict {
+            background: #764ba2;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-predict:hover { background: #4a148c; color: white; transform: translateY(-2px); }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-size: 1.2rem; display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="text-end mb-2">
+        <a href="/about" class="text-decoration-none" style="color: #764ba2; font-weight: bold; font-size: 0.95rem;">About Project &rarr;</a>
+    </div>
+    <h2>🏦 Bank Marketing Prediction</h2>
+    <form action="/predict" method="POST" class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Age</label>
+            <input type="number" name="age" class="form-control" placeholder="e.g. 35" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Balance ($)</label>
+            <input type="number" name="balance" class="form-control" placeholder="e.g. 2500" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Duration (sec)</label>
+            <input type="number" name="duration" class="form-control" required>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Job</label>
+            <select name="job" class="form-select">
+                <option value="management">Management</option>
+                <option value="technician">Technician</option>
+                <option value="blue-collar">Blue-collar</option>
+                <option value="admin.">Admin</option>
+                <option value="services">Services</option>
+                <option value="retired">Retired</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Marital Status</label>
+            <select name="marital" class="form-select">
+                <option value="married">Married</option>
+                <option value="single">Single</option>
+                <option value="divorced">Divorced</option>
+            </select>
+        </div>
+        
+        <div class="col-md-6">
+            <label class="form-label">Housing Loan?</label>
+            <select name="housing" class="form-select">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Personal Loan?</label>
+            <select name="loan" class="form-select">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-predict w-100">Analyze Subscription Probability</button>
+        </div>
+    </form>
+    
+    {% if prediction_text %}
+    <div class="result-box alert alert-info" style="display: block;">
+        {{ prediction_text }}
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>
