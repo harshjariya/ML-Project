@@ -3,102 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Deposit Predictor</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <title>DepositIQ — Bank Subscription Predictor</title>
+    <meta name="description" content="AI-powered bank term deposit subscription predictor using machine learning on real marketing data.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #050b18;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.07);
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(99,179,237,0.35);
+            --accent: #63b3ed;
+            --accent2: #a78bfa;
+            --accent3: #34d399;
+            --danger: #f87171;
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            --glow: 0 0 30px rgba(99,179,237,0.15);
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Animated Background ── */
+        #canvas-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.12;
+            animation: drift 20s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb1 { width: 600px; height: 600px; background: #4f46e5; top: -200px; left: -150px; animation-duration: 18s; }
+        .orb2 { width: 500px; height: 500px; background: #0ea5e9; bottom: -150px; right: -100px; animation-duration: 24s; }
+        .orb3 { width: 350px; height: 350px; background: #7c3aed; top: 40%; left: 50%; animation-duration: 15s; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(40px, 30px) scale(1.08); }
+        }
+
+        /* ── Layout ── */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Navbar ── */
+        nav {
+            display: flex;
             align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            justify-content: space-between;
+            padding: 18px 40px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(5,11,24,0.6);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 800px;
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
         }
-        h2 { color: #4a148c; font-weight: bold; margin-bottom: 25px; text-align: center; }
-        .form-label { font-weight: 600; color: #333; }
+        .nav-logo .logo-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .nav-logo span.brand { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.25s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .nav-link:hover { color: var(--accent); border-color: var(--border-glow); background: rgba(99,179,237,0.07); }
+
+        /* ── Hero Header ── */
+        .hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99,179,237,0.1);
+            border: 1px solid rgba(99,179,237,0.25);
+            color: var(--accent);
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .hero-badge .dot { width: 6px; height: 6px; background: var(--accent3); border-radius: 50%; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(0.7);} }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #e2e8f0 0%, var(--accent) 50%, var(--accent2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1rem;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ── Main Card ── */
+        .card-wrapper {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+            width: 100%;
+        }
+
+        .glass-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 40px 80px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .card-header-bar {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+        }
+        .card-header-bar .dot-row { display: flex; gap: 7px; }
+        .card-header-bar .dot-row span { width: 12px; height: 12px; border-radius: 50%; }
+        .d1 { background: #f87171; }
+        .d2 { background: #fbbf24; }
+        .d3 { background: #34d399; }
+        .card-header-title { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; margin-left: 8px; font-family: monospace; }
+
+        .card-body { padding: 36px 32px; }
+
+        /* ── Form Grid ── */
+        .form-section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-label::after { content:''; flex:1; height:1px; background: var(--border); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 28px; }
+        .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 28px; }
+
+        .field { display: flex; flex-direction: column; gap: 8px; }
+
+        label.lbl {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        input[type="number"], select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px 16px;
+            color: var(--text);
+            font-size: 0.92rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        input[type="number"]::placeholder { color: var(--text-muted); }
+        input[type="number"]:focus, select:focus {
+            border-color: var(--accent);
+            background: rgba(99,179,237,0.06);
+            box-shadow: 0 0 0 3px rgba(99,179,237,0.12);
+        }
+        input[type="number"]:hover, select:hover { border-color: rgba(255,255,255,0.15); }
+
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+        select option { background: #0f1729; }
+
+        /* ── Submit Button ── */
         .btn-predict {
-            background: #764ba2;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 14px;
             color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            transition: 0.3s;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+            margin-top: 8px;
         }
-        .btn-predict:hover { background: #4a148c; color: white; transform: translateY(-2px); }
-        .result-box { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-size: 1.2rem; display: none; }
+        .btn-predict::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-predict:hover::before { opacity: 1; }
+        .btn-predict:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(99,102,241,0.45); }
+        .btn-predict:active { transform: translateY(0); }
+        .btn-predict span { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* ── Result Box ── */
+        .result-wrapper { margin-top: 28px; }
+
+        .result-box {
+            padding: 24px 28px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes slideUp { from { opacity:0; transform: translateY(20px) scale(0.97); } to { opacity:1; transform: none; } }
+
+        .result-success {
+            background: rgba(52,211,153,0.08);
+            border: 1px solid rgba(52,211,153,0.3);
+        }
+        .result-fail {
+            background: rgba(248,113,113,0.08);
+            border: 1px solid rgba(248,113,113,0.3);
+        }
+        .result-error {
+            background: rgba(251,191,36,0.08);
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+
+        .result-icon { font-size: 2.2rem; flex-shrink: 0; }
+        .result-content .result-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .result-success .result-label { color: var(--accent3); }
+        .result-fail .result-label { color: var(--danger); }
+        .result-error .result-label { color: #fbbf24; }
+        .result-content .result-text { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+        /* ── Stats Strip ── */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border-top: 1px solid var(--border);
+            margin-top: 36px;
+        }
+        .stat-item {
+            background: var(--bg);
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-number { font-size: 1.5rem; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; font-weight: 500; }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 680px) {
+            nav { padding: 14px 20px; }
+            .card-body { padding: 24px 20px; }
+            .form-grid, .form-grid-2 { grid-template-columns: 1fr; }
+            .stats-strip { grid-template-columns: 1fr; }
+            .hero { padding: 40px 20px 24px; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="text-end mb-2">
-        <a href="/about" class="text-decoration-none" style="color: #764ba2; font-weight: bold; font-size: 0.95rem;">About Project &rarr;</a>
-    </div>
-    <h2>🏦 Bank Marketing Prediction</h2>
-    <form action="/predict" method="POST" class="row g-3">
-        <div class="col-md-4">
-            <label class="form-label">Age</label>
-            <input type="number" name="age" class="form-control" placeholder="e.g. 35" required>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Balance ($)</label>
-            <input type="number" name="balance" class="form-control" placeholder="e.g. 2500" required>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Duration (sec)</label>
-            <input type="number" name="duration" class="form-control" required>
-        </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Job</label>
-            <select name="job" class="form-select">
-                <option value="management">Management</option>
-                <option value="technician">Technician</option>
-                <option value="blue-collar">Blue-collar</option>
-                <option value="admin.">Admin</option>
-                <option value="services">Services</option>
-                <option value="retired">Retired</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Marital Status</label>
-            <select name="marital" class="form-select">
-                <option value="married">Married</option>
-                <option value="single">Single</option>
-                <option value="divorced">Divorced</option>
-            </select>
-        </div>
-        
-        <div class="col-md-6">
-            <label class="form-label">Housing Loan?</label>
-            <select name="housing" class="form-select">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Personal Loan?</label>
-            <select name="loan" class="form-select">
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
 
-        <div class="col-12 mt-4">
-            <button type="submit" class="btn btn-predict w-100">Analyze Subscription Probability</button>
+<div class="page-wrapper">
+
+    <!-- Navbar -->
+    <nav>
+        <a href="/" class="nav-logo">
+            <div class="logo-icon">🏦</div>
+            <span class="brand">DepositIQ</span>
+        </a>
+        <a href="/about" class="nav-link">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            About Project
+        </a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge"><span class="dot"></span> ML-Powered · Random Forest</div>
+        <h1>Predict Term Deposit<br>Subscriptions with AI</h1>
+        <p>Enter client demographics and financial data to get an instant ML prediction on subscription likelihood.</p>
+    </section>
+
+    <!-- Main Card -->
+    <div class="card-wrapper">
+        <div class="glass-card">
+            <div class="card-header-bar">
+                <div class="dot-row"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+                <span class="card-header-title">prediction_model.py — input_form</span>
+            </div>
+
+            <div class="card-body">
+                <form action="/predict" method="POST" id="predict-form">
+
+                    <div class="form-section-label">Numeric Inputs</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label class="lbl" for="age">Age</label>
+                            <input type="number" id="age" name="age" placeholder="e.g. 35" min="18" max="95" required>
+                        </div>
+                        <div class="field">
+                            <label class="lbl" for="balance">Balance ($)</label>
+                            <input type="number" id="balance" name="balance" placeholder="e.g. 2500" required>
+                        </div>
+                        <div class="field">
+                            <label class="lbl" for="duration">Call Duration (s)</label>
+                            <input type="number" id="duration" name="duration" placeholder="e.g. 180" required>
+                        </div>
+                    </div>
+
+                    <div class="form-section-label">Categorical Inputs</div>
+                    <div class="form-grid-2">
+                        <div class="field">
+                            <label class="lbl" for="job">Occupation</label>
+                            <select id="job" name="job">
+                                <option value="management">Management</option>
+                                <option value="technician">Technician</option>
+                                <option value="blue-collar">Blue-Collar</option>
+                                <option value="admin.">Admin</option>
+                                <option value="services">Services</option>
+                                <option value="retired">Retired</option>
+                                <option value="entrepreneur">Entrepreneur</option>
+                                <option value="self-employed">Self-Employed</option>
+                                <option value="unemployed">Unemployed</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="lbl" for="marital">Marital Status</label>
+                            <select id="marital" name="marital">
+                                <option value="married">Married</option>
+                                <option value="single">Single</option>
+                                <option value="divorced">Divorced</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="lbl" for="housing">Housing Loan</label>
+                            <select id="housing" name="housing">
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="lbl" for="loan">Personal Loan</label>
+                            <select id="loan" name="loan">
+                                <option value="no">No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-predict" id="submit-btn">
+                        <span>
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                            Analyze Subscription Probability
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Result -->
+                {% if prediction_text %}
+                <div class="result-wrapper">
+                    {% if '✅' in prediction_text %}
+                    <div class="result-box result-success">
+                        <div class="result-icon">✅</div>
+                        <div class="result-content">
+                            <div class="result-label">Prediction Result</div>
+                            <div class="result-text">Client is likely to subscribe to a term deposit.</div>
+                        </div>
+                    </div>
+                    {% elif '❌' in prediction_text %}
+                    <div class="result-box result-fail">
+                        <div class="result-icon">❌</div>
+                        <div class="result-content">
+                            <div class="result-label">Prediction Result</div>
+                            <div class="result-text">Client is unlikely to subscribe to a term deposit.</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="result-box result-error">
+                        <div class="result-icon">⚠️</div>
+                        <div class="result-content">
+                            <div class="result-label">System Notice</div>
+                            <div class="result-text">{{ prediction_text }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-strip">
+                <div class="stat-item">
+                    <div class="stat-number">45K+</div>
+                    <div class="stat-label">Training Records</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">~89%</div>
+                    <div class="stat-label">Model Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Input Features</div>
+                </div>
+            </div>
         </div>
-    </form>
-    
-    {% if prediction_text %}
-    <div class="result-box alert alert-info" style="display: block;">
-        {{ prediction_text }}
     </div>
-    {% endif %}
+
+    <footer>
+        Built with Flask &amp; Scikit-Learn &nbsp;·&nbsp; Bank Marketing Dataset (UCI ML Repository)
+    </footer>
 </div>
+
+<script>
+    // Loading state on submit
+    document.getElementById('predict-form').addEventListener('submit', function() {
+        const btn = document.getElementById('submit-btn');
+        btn.innerHTML = '<span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Analyzing...</span>';
+        btn.style.opacity = '0.75';
+        btn.style.cursor = 'not-allowed';
+    });
+
+    // Subtle input glow on number change
+    document.querySelectorAll('input[type="number"]').forEach(inp => {
+        inp.addEventListener('input', () => {
+            inp.style.borderColor = inp.value ? 'var(--accent)' : '';
+        });
+    });
+</script>
 </body>
 </html>

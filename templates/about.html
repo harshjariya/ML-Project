@@ -1,115 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Bank Deposit Predictor</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <title>About — DepositIQ</title>
+    <meta name="description" content="Learn about the DepositIQ Bank Marketing Prediction ML project, its dataset, model, and methodology.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #050b18;
+            --surface: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(99,179,237,0.35);
+            --accent: #63b3ed;
+            --accent2: #a78bfa;
+            --accent3: #34d399;
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            max-width: 800px;
-        }
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: 0.12; animation: drift 20s ease-in-out infinite alternate; pointer-events: none; z-index: 0; }
+        .orb1 { width: 600px; height: 600px; background: #4f46e5; top: -200px; left: -150px; animation-duration: 18s; }
+        .orb2 { width: 500px; height: 500px; background: #0ea5e9; bottom: -150px; right: -100px; animation-duration: 24s; }
+        .orb3 { width: 350px; height: 350px; background: #7c3aed; top: 40%; left: 50%; animation-duration: 15s; }
+        @keyframes drift { from{transform:translate(0,0) scale(1);} to{transform:translate(40px,30px) scale(1.08);} }
 
-        h2 {
-            color: #4a148c;
-            font-weight: bold;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+        .page-wrapper { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
 
-        .content-box {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 5px solid #764ba2;
-            margin-bottom: 25px;
-            font-size: 1.05rem;
-            color: #444;
-            line-height: 1.6;
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px; border-bottom: 1px solid var(--border);
+            background: rgba(5,11,24,0.6); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100;
         }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -0.5px; }
+        .nav-logo .logo-icon { width:34px; height:34px; background:linear-gradient(135deg,var(--accent),var(--accent2)); border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+        .nav-logo span.brand { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-link { color:var(--text-dim); text-decoration:none; font-size:0.875rem; font-weight:500; padding:8px 16px; border-radius:8px; border:1px solid var(--border); transition:all 0.25s; display:flex; align-items:center; gap:6px; }
+        .nav-link:hover { color:var(--accent); border-color:var(--border-glow); background:rgba(99,179,237,0.07); }
 
-        .btn-home {
-            background: #764ba2;
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-            transition: 0.3s;
-            display: inline-block;
-            text-align: center;
-            text-decoration: none;
+        /* Hero */
+        .hero { text-align:center; padding:60px 20px 40px; }
+        .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(167,139,250,0.1); border:1px solid rgba(167,139,250,0.25); color:var(--accent2); font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:100px; margin-bottom:20px; letter-spacing:0.5px; text-transform:uppercase; }
+        .hero h1 { font-size:clamp(1.8rem,4.5vw,2.8rem); font-weight:800; letter-spacing:-1.2px; margin-bottom:14px; background:linear-gradient(135deg,#e2e8f0 0%,var(--accent) 50%,var(--accent2) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .hero p { color:var(--text-dim); font-size:1rem; max-width:520px; margin:0 auto; line-height:1.7; }
+
+        /* Content */
+        .content-wrapper { max-width: 860px; margin: 0 auto; padding: 0 20px 60px; width: 100%; }
+
+        .glass-card { background:var(--surface); border:1px solid var(--border); border-radius:24px; backdrop-filter:blur(20px); box-shadow:0 0 0 1px rgba(255,255,255,0.02),0 40px 80px rgba(0,0,0,0.5); overflow:hidden; margin-bottom:20px; }
+
+        .card-inner { padding: 36px 32px; }
+
+        /* Overview Block */
+        .overview-block {
+            background: linear-gradient(135deg, rgba(99,179,237,0.07), rgba(167,139,250,0.07));
+            border: 1px solid rgba(99,179,237,0.15);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 36px;
+            position: relative;
+            overflow: hidden;
         }
+        .overview-block::before { content:''; position:absolute; top:-40px; right:-40px; width:150px; height:150px; background:radial-gradient(circle, rgba(99,179,237,0.15), transparent 70%); }
+        .overview-block p { color: var(--text-dim); line-height: 1.8; font-size: 0.95rem; }
+        .overview-block p strong { color: var(--accent); font-weight: 600; }
 
-        .btn-home:hover {
-            background: #4a148c;
-            color: white;
-            transform: translateY(-2px);
+        /* Section Label */
+        .section-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+        .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+        /* Feature Grid */
+        .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 36px; }
+
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
         }
+        .feature-card:hover { border-color: var(--border-glow); background: rgba(99,179,237,0.04); transform: translateY(-2px); }
+        .feature-card .card-icon { font-size: 1.8rem; margin-bottom: 12px; }
+        .feature-card h3 { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .feature-card p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
+        .feature-card .accent-tag { display:inline-block; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; padding:3px 8px; border-radius:6px; margin-top:10px; }
+        .tag-blue { background:rgba(99,179,237,0.15); color:var(--accent); }
+        .tag-purple { background:rgba(167,139,250,0.15); color:var(--accent2); }
+        .tag-green { background:rgba(52,211,153,0.15); color:var(--accent3); }
 
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+        /* Pipeline Steps */
+        .pipeline { display:flex; flex-direction:column; gap:0; margin-bottom:36px; }
+        .pipeline-step { display:flex; gap:20px; align-items:flex-start; padding:20px 0; border-bottom:1px solid var(--border); }
+        .pipeline-step:last-child { border-bottom:none; }
+        .step-num { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem; flex-shrink:0; color:#fff; }
+        .step-content h4 { font-size:0.9rem; font-weight:700; color:var(--text); margin-bottom:5px; }
+        .step-content p { font-size:0.82rem; color:var(--text-dim); line-height:1.6; }
 
-        .feature-icon {
-            font-size: 1.5rem;
-            margin-right: 15px;
+        /* Tech Stack */
+        .tech-grid { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:36px; }
+        .tech-badge { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:10px 16px; font-size:0.82rem; font-weight:600; color:var(--text-dim); transition:all 0.2s; }
+        .tech-badge:hover { border-color:var(--border-glow); color:var(--accent); }
+        .tech-badge .tb-icon { font-size:1.1rem; }
+
+        /* Input features list */
+        .features-list { display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:36px; }
+        .feat-item { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:0.8rem; color:var(--text-dim); display:flex; align-items:center; gap:8px; }
+        .feat-item .fi-dot { width:7px; height:7px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); flex-shrink:0; }
+
+        /* CTA */
+        .cta-block { padding:32px; text-align:center; background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(124,58,237,0.08)); border-top:1px solid var(--border); }
+        .cta-block p { color:var(--text-dim); font-size:0.88rem; margin-bottom:18px; }
+        .btn-home { display:inline-flex; align-items:center; gap:10px; padding:14px 32px; background:linear-gradient(135deg,#3b82f6,#7c3aed); border-radius:12px; color:white; font-weight:700; font-size:0.95rem; text-decoration:none; transition:all 0.3s; font-family:'Inter',sans-serif; }
+        .btn-home:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(99,102,241,0.45); }
+
+        footer { text-align:center; padding:24px; color:var(--text-muted); font-size:0.78rem; border-top:1px solid var(--border); }
+
+        @media (max-width:680px) {
+            nav { padding:14px 20px; }
+            .card-inner { padding:24px 20px; }
+            .feature-grid { grid-template-columns:1fr; }
+            .features-list { grid-template-columns:repeat(2,1fr); }
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="text-start mb-2">
-            <a href="/" class="text-decoration-none"
-                style="color: #764ba2; font-weight: bold; font-size: 0.95rem;">&larr; Back to Predictor</a>
-        </div>
-        <h2>ℹ️ About the Project</h2>
 
-        <div class="content-box">
-            <p class="mb-0">
-                <strong>Bank Marketing Prediction</strong> is a Machine Learning web application designed to help banks
-                predict whether a client will subscribe to a term deposit. This targeted marketing strategy helps
-                optimize promotional campaigns and allocate resources effectively.
-            </p>
-        </div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
 
-        <div class="row px-3 mt-4">
-            <div class="col-md-6 mb-3">
-                <h5 style="color: #4a148c; font-weight: bold;">How It Works</h5>
-                <p class="text-muted" style="font-size: 0.95rem;">
-                    By analyzing historical marketing data, the deployed machine learning model predicts client behavior
-                    based on specific demographic and financial attributes using advanced classification algorithms.
-                </p>
+<div class="page-wrapper">
+
+    <nav>
+        <a href="/" class="nav-logo">
+            <div class="logo-icon">🏦</div>
+            <span class="brand">DepositIQ</span>
+        </a>
+        <a href="/" class="nav-link">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to Predictor
+        </a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">📖 Project Documentation</div>
+        <h1>About DepositIQ</h1>
+        <p>A machine learning system trained on real-world bank marketing data to predict term deposit subscription probability.</p>
+    </section>
+
+    <div class="content-wrapper">
+        <div class="glass-card">
+            <div class="card-inner">
+
+                <!-- Overview -->
+                <div class="overview-block">
+                    <p>
+                        <strong>DepositIQ</strong> is a supervised ML classification system built on the
+                        <strong>UCI Bank Marketing Dataset</strong> — containing over 45,000 records from a
+                        Portuguese bank's direct marketing campaigns. The model predicts whether a client will
+                        subscribe to a <strong>term deposit</strong> based on demographic and financial attributes,
+                        empowering banks to optimize campaign targeting and maximize ROI.
+                    </p>
+                </div>
+
+                <!-- Feature Cards -->
+                <div class="section-label">Core Capabilities</div>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="card-icon">🧠</div>
+                        <h3>ML Classification</h3>
+                        <p>Uses a trained pipeline with preprocessing and a Random Forest / Logistic Regression classifier for binary outcome prediction.</p>
+                        <span class="accent-tag tag-blue">Scikit-Learn</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Real-World Dataset</h3>
+                        <p>Trained on 45,211 records from UCI ML Repository with balanced feature engineering and one-hot encoding.</p>
+                        <span class="accent-tag tag-purple">UCI Repository</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="card-icon">⚡</div>
+                        <h3>Real-Time Inference</h3>
+                        <p>Flask backend runs inference via a serialized <code style="color:var(--accent);font-size:0.78rem;">model.pkl</code> pipeline — predictions return in milliseconds.</p>
+                        <span class="accent-tag tag-green">~89% Accuracy</span>
+                    </div>
+                    <div class="feature-card">
+                        <div class="card-icon">🌐</div>
+                        <h3>Cloud Deployed</h3>
+                        <p>Deployed on Vercel with a Python serverless runtime — accessible from anywhere, no setup required.</p>
+                        <span class="accent-tag tag-blue">Vercel</span>
+                    </div>
+                </div>
+
+                <!-- Pipeline -->
+                <div class="section-label">How It Works</div>
+                <div class="pipeline">
+                    <div class="pipeline-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <h4>User Input Collection</h4>
+                            <p>Client data (age, balance, job, marital status, loans, call duration) is collected via the web form and sent as a POST request.</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <h4>Feature Engineering</h4>
+                            <p>The raw form data is converted to a Pandas DataFrame. Default values are injected for unseen features to match the training schema.</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <h4>Pipeline Inference</h4>
+                            <p>The serialized <code style="color:var(--accent)">model.pkl</code> pipeline applies preprocessing (encoding + scaling) and runs the classifier to output a binary prediction.</p>
+                        </div>
+                    </div>
+                    <div class="pipeline-step">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <h4>Result Rendering</h4>
+                            <p>The prediction (Yes/No subscription) is returned to the UI with contextual messaging, styled to communicate confidence clearly.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Features -->
+                <div class="section-label">Model Input Features</div>
+                <div class="features-list">
+                    <div class="feat-item"><span class="fi-dot"></span> Age</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Job Type</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Marital Status</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Education Level</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Account Balance</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Housing Loan</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Personal Loan</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Contact Type</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Call Duration</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Campaign Count</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Days Since Contact</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Previous Contacts</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Previous Outcome</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Credit Default</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Month</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Day of Week</div>
+                    <div class="feat-item"><span class="fi-dot"></span> Target: Subscribed</div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="section-label">Technology Stack</div>
+                <div class="tech-grid">
+                    <div class="tech-badge"><span class="tb-icon">🐍</span> Python 3</div>
+                    <div class="tech-badge"><span class="tb-icon">🌶️</span> Flask</div>
+                    <div class="tech-badge"><span class="tb-icon">🤖</span> Scikit-Learn</div>
+                    <div class="tech-badge"><span class="tb-icon">🐼</span> Pandas</div>
+                    <div class="tech-badge"><span class="tb-icon">🔢</span> NumPy</div>
+                    <div class="tech-badge"><span class="tb-icon">💾</span> Joblib</div>
+                    <div class="tech-badge"><span class="tb-icon">☁️</span> Vercel</div>
+                    <div class="tech-badge"><span class="tb-icon">📊</span> UCI ML Dataset</div>
+                </div>
+
             </div>
-            <div class="col-md-6 mb-3">
-                <h5 style="color: #4a148c; font-weight: bold;">Key Input Features</h5>
-                <ul class="text-muted" style="font-size: 0.95rem; padding-left: 1.2rem;">
-                    <li><strong>Demographics:</strong> Age, Job, Marital Status</li>
-                    <li><strong>Financials:</strong> Account Balance, existing Loans</li>
-                    <li><strong>Campaign Data:</strong> Call Duration</li>
-                </ul>
-            </div>
-        </div>
 
-        <div class="text-center mt-4">
-            <a href="/" class="btn-home w-100">Try the Predictor Now</a>
+            <!-- CTA -->
+            <div class="cta-block">
+                <p>Ready to run a prediction? Head back to the main tool.</p>
+                <a href="/" class="btn-home">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    Try the Predictor
+                </a>
+            </div>
         </div>
     </div>
-</body>
 
+    <footer>
+        Built with Flask &amp; Scikit-Learn &nbsp;·&nbsp; Bank Marketing Dataset (UCI ML Repository)
+    </footer>
+</div>
+
+</body>
 </html>
